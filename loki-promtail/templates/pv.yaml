@@ -1,18 +1,17 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: {{ include "loki.fullname" . }}-pv
+  name: loki-pv
   labels:
-    {{- include "loki.labels" . | nindent 4 }}
-  annotations:
-    volume.beta.kubernetes.io/storage-class: "standard"
+    app: loki
+    release: loki
 spec:
   capacity:
-    storage: {{ .Values.persistence.size | default "50Gi" }}
+    storage: 50Gi
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: {{ .Values.persistence.storageClassName | default "standard" }}
+  storageClassName: standard
   hostPath:
     path: /data/loki
     type: DirectoryOrCreate
@@ -23,4 +22,4 @@ spec:
         - key: kubernetes.io/hostname
           operator: In
           values:
-          - worker-node1 # Specify your node hostname
+          - worker-node1  # Change to your actual node hostname
