@@ -42,3 +42,19 @@ resources: {}
 retention:
   enabled: true
   period: "7d"  # Logs retention period, e.g., 7 days
+
+grafana:
+  enabled: true
+  sidecar:
+    datasources:
+      enabled: true
+      label: grafana_datasource
+  datasources:
+    influxdb:
+      name: InfluxDB
+      type: influxdb
+      url: http://3.85.34.66:8086  # Replace with your InfluxDB instance URL
+      access: proxy
+      jsonData:
+        httpMethod: POST
+        timeInterval: "10s"
