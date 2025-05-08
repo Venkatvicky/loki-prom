@@ -1,23 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "loki.fullname" . }}
+  name: loki
   labels:
-    app: {{ include "loki.name" . }}
-    chart: {{ include "loki.chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+    app: loki
+    chart: loki-chart
+    release: my-release
+    heritage: Helm
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: 1
   selector:
     matchLabels:
-      app: {{ include "loki.name" . }}
-      release: {{ .Release.Name }}
+      app: loki
+      release: my-release
   template:
     metadata:
       labels:
-        app: {{ include "loki.name" . }}
-        release: {{ .Release.Name }}
+        app: loki
+        release: my-release
     spec:
       securityContext:
         runAsUser: 10001
@@ -35,8 +35,8 @@ spec:
               mountPath: /loki
       containers:
         - name: loki
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: grafana/loki:2.9.0
+          imagePullPolicy: IfNotPresent
           args:
             - -config.file=/etc/loki/loki.yaml
           ports:
@@ -46,11 +46,11 @@ spec:
             - name: config
               mountPath: /etc/loki
             - name: storage
-              mountPath: /mnt/data/loki 
+              mountPath: /mnt/data/loki
       volumes:
         - name: config
           configMap:
-            name: {{ include "loki.fullname" . }}-config  # Ensure the ConfigMap is created
+            name: loki-loki-config  # Ensure this matches the actual ConfigMap name
         - name: storage
           persistentVolumeClaim:
-            claimName: {{ .Values.persistence.existingClaim | default (include "loki.fullname" .) }}
+            claimName: loki-pvc  # Ensure this matches the PVC name
