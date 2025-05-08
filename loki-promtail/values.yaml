@@ -1,11 +1,16 @@
-# values.yaml - Production-grade Loki configuration
-
 global:
   image:
     registry: docker.io
     repository: grafana/loki
     tag: 2.9.1
     pullPolicy: IfNotPresent
+
+# Service Account Configuration (fixes your error)
+serviceAccount:
+  create: true
+  name: loki-serviceaccount
+  annotations: {}
+  automountServiceAccountToken: true
 
 loki:
   auth_enabled: false
@@ -16,7 +21,7 @@ loki:
         store: memberlist
 
   storage:
-    type: 'filesystem'
+    type: filesystem
     bucketNames:
       chunks: chunks
       ruler: ruler
@@ -74,6 +79,7 @@ loki:
   query_scheduler:
     max_outstanding_requests_per_tenant: 2048
 
+# Persistence - consider using PVC instead of hostPath for production
 persistence:
   enabled: true
   accessModes:
@@ -81,11 +87,11 @@ persistence:
   size: 50Gi
   storageClassName: "standard"
   annotations: {}
-  # For hostPath PVs (only needed if using hostPath)
+  # Only use hostPath for development
   hostPath:
     enabled: false
     path: /data/loki
-    nodeName: worker-node1 # Change to your actual node hostname
+    nodeName: worker-node1
 
 service:
   type: ClusterIP
@@ -93,8 +99,12 @@ service:
   targetPort: http-metrics
   annotations: {}
 
+# Enable monitoring if you have Prometheus Operator
 serviceMonitor:
   enabled: false
+  interval: 10s
+  scrapeTimeout: 10s
+  labels: {}
 
 resources:
   limits:
@@ -104,9 +114,21 @@ resources:
     cpu: 1
     memory: 2Gi
 
+# Security Context
+securityContext:
+  fsGroup: 10001
+  runAsGroup: 10001
+  runAsNonRoot: true
+  runAsUser: 10001
+
 podAnnotations:
   prometheus.io/scrape: "true"
   prometheus.io/port: "http-metrics"
+
+# Pod Disruption Budget for high availability
+pdb:
+  enabled: true
+  minAvailable: 1
 
 nodeSelector: {}
 tolerations: []
