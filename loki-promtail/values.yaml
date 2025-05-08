@@ -79,8 +79,13 @@ persistence:
   accessModes:
     - ReadWriteOnce
   size: 50Gi
-  storageClassName: standard
+  storageClassName: "standard"
   annotations: {}
+  # For hostPath PVs (only needed if using hostPath)
+  hostPath:
+    enabled: false
+    path: /data/loki
+    nodeName: worker-node1 # Change to your actual node hostname
 
 service:
   type: ClusterIP
