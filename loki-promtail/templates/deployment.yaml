@@ -1,18 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: loki
+  name: {{ include "loki.fullname" . }}
   labels:
-    app: loki
+    app: {{ include "loki.name" . }}
+    chart: {{ include "loki.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: loki
+      app: {{ include "loki.name" . }}
+      release: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app: loki
+        app: {{ include "loki.name" . }}
+        release: {{ .Release.Name }}
     spec:
       securityContext:
         runAsUser: 10001
@@ -25,13 +30,13 @@ spec:
           securityContext:
             runAsUser: 0
             runAsGroup: 0
-            privileged: false
           volumeMounts:
             - name: storage
               mountPath: /loki
       containers:
         - name: loki
-          image: grafana/loki:2.9.0
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
             - -config.file=/etc/loki/loki.yaml
           ports:
@@ -41,4 +46,11 @@ spec:
             - name: config
               mountPath: /etc/loki
             - name: storage
-              mount
+              mountPath: /loki
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "loki.fullname" . }}-config
+        - name: storage
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim | default (include "loki.fullname" .) }}
