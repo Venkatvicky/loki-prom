@@ -13,7 +13,9 @@ spec:
         app: loki
     spec:
       securityContext:
-        fsGroup: 1000  # Set the group ID that should own the storage volume
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
       containers:
         - name: loki
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -26,7 +28,7 @@ spec:
             - name: config
               mountPath: /etc/loki
             - name: storage
-              mountPath: /mnt/data/loki # This is the path inside the container where Loki will use the volume
+              mountPath: /loki
       volumes:
         - name: config
           configMap:
