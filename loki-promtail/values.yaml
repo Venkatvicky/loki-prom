@@ -5,7 +5,7 @@ global:
     tag: 2.9.1
     pullPolicy: IfNotPresent
 
-# Service Account Configuration (fixes your error)
+# Service Account Configuration
 serviceAccount:
   create: true
   name: loki-serviceaccount
@@ -79,14 +79,18 @@ loki:
   query_scheduler:
     max_outstanding_requests_per_tenant: 2048
 
-# Persistence - consider using PVC instead of hostPath for production
+# Persistence Configuration
 persistence:
   enabled: true
-  accessModes:
-    - ReadWriteOnce
   size: 50Gi
   storageClassName: "standard"
+  accessModes:
+    - ReadWriteOnce
   annotations: {}
+  # Optional selector configuration
+  # selector:
+  #   matchLabels:
+  #     custom-label: loki-volume
   # Only use hostPath for development
   hostPath:
     enabled: false
@@ -99,13 +103,14 @@ service:
   targetPort: http-metrics
   annotations: {}
 
-# Enable monitoring if you have Prometheus Operator
+# Monitoring Configuration
 serviceMonitor:
   enabled: false
   interval: 10s
   scrapeTimeout: 10s
   labels: {}
 
+# Resource Configuration
 resources:
   limits:
     cpu: 2
@@ -114,22 +119,24 @@ resources:
     cpu: 1
     memory: 2Gi
 
-# Security Context
+# Security Configuration
 securityContext:
   fsGroup: 10001
   runAsGroup: 10001
   runAsNonRoot: true
   runAsUser: 10001
 
+# Pod Annotations
 podAnnotations:
   prometheus.io/scrape: "true"
   prometheus.io/port: "http-metrics"
 
-# Pod Disruption Budget for high availability
+# High Availability
 pdb:
   enabled: true
   minAvailable: 1
 
+# Scheduling Configuration
 nodeSelector: {}
 tolerations: []
 affinity: {}
