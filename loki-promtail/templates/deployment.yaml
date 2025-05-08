@@ -15,7 +15,7 @@ spec:
       securityContext:
         runAsUser: 10001
         runAsGroup: 10001
-        fsGroup: 10001
+        fsGroup: 10001   # <- Gives container access to mounted volumes
       containers:
         - name: loki
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -28,9 +28,9 @@ spec:
             - name: config
               mountPath: /etc/loki
             - name: storage
-              mountPath: /loki
+              mountPath: /loki         # For chunks and index
             - name: storage
-              mountPath: /wal        # ← Mount the same PVC to /wal
+              mountPath: /wal          # For WAL
       volumes:
         - name: config
           configMap:
