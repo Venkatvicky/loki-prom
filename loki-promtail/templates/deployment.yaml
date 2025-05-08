@@ -50,7 +50,7 @@ spec:
       volumes:
         - name: config
           configMap:
-            name: loki-loki-config
+            name: loki-loki-config  # Ensure this matches the ConfigMap name
         - name: storage
           persistentVolumeClaim:
-            claimName: loki-pvc
+            claimName: loki-pvc  # Ensure this matches the PVC name
