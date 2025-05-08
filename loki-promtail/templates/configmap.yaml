@@ -1,40 +1,48 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: loki-loki-config
-  namespace: loki  # Make sure this is the right namespace
+  name: {{ include "loki.fullname" . }}-config
+  labels:
+    {{- include "loki.labels" . | nindent 4 }}
 data:
   loki.yaml: |
-    auth_enabled: false
+    auth_enabled: {{ .Values.loki.auth_enabled }}
 
     server:
       http_listen_port: 3100
       grpc_listen_port: 9095
-      log_level: debug
+
+    common:
+      storage:
+        {{- toYaml .Values.loki.commonConfig | nindent 8 }}
+      path_prefix: /loki
+      ring:
+        kvstore:
+          store: memberlist
+        replication_factor: {{ .Values.loki.commonConfig.replication_factor }}
+
+    schema_config:
+      configs:
+        {{- toYaml .Values.loki.schemaConfig.configs | nindent 8 }}
 
     storage_config:
-      boltdb_shipper:
-        active_index_directory: /mnt/data/loki/index
-        cache_location: /mnt/data/loki/cache
       filesystem:
-        directory: /mnt/data/loki/chunks
+        chunks_directory: {{ .Values.loki.storage.filesystem.chunks_directory }}
+        rules_directory: {{ .Values.loki.storage.filesystem.rules_directory }}
+      boltdb_shipper:
+        {{- toYaml .Values.loki.storage_config.boltdb_shipper | nindent 8 }}
 
-    ring:
-      kvstore:
-        store: memberlist
-      replication_factor: 1
-
-    index:
-      prefix: loki_index_
-      period: 24h
+    ingester:
+      {{- toYaml .Values.loki.ingester | nindent 6 }}
 
     limits_config:
-      enforce_metric_name: false
-      ingestion_rate_mb: 5
-      ingestion_rate_limit: 5000000
-      max_entries_limit: 50000
+      {{- toYaml .Values.loki.limits_config | nindent 6 }}
 
-    scrape_configs:
-      - job_name: 'loki'
-        static_configs:
-          - targets: ['localhost:3100']
+    compactor:
+      {{- toYaml .Values.loki.compactor | nindent 6 }}
+
+    memberlist:
+      {{- toYaml .Values.loki.memberlist | nindent 6 }}
+
+    query_scheduler:
+      {{- toYaml .Values.loki.query_scheduler | nindent 6 }}
