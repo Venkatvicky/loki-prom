@@ -16,6 +16,13 @@ spec:
         runAsUser: 10001
         runAsGroup: 10001
         fsGroup: 10001
+      initContainers:
+        - name: fix-permissions
+          image: busybox
+          command: ["sh", "-c", "chown -R 10001:10001 /loki"]
+          volumeMounts:
+            - name: storage
+              mountPath: /loki  # Ensure it mounts the same volume where Loki will write its data
       containers:
         - name: loki
           image: "grafana/loki:2.9.0"
