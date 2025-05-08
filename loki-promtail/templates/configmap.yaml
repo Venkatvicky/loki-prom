@@ -2,10 +2,11 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: loki-loki-config
-  namespace: loki  # Ensure the correct namespace
+  namespace: loki  # Make sure you're using the correct namespace
 data:
   loki.yaml: |
     # Loki configuration file
+
     auth_enabled: false
 
     server:
@@ -18,29 +19,25 @@ data:
       boltdb_shipper:
         active_index_directory: /mnt/data/loki/index
         cache_location: /mnt/data/loki/cache
-        max_compaction_idle: 5m
       filesystem:
         directory: /mnt/data/loki/chunks
 
-    # Specify the ring configuration for distributed mode
+    # Ring configuration for distributed mode
     ring:
       kvstore:
         store: memberlist
       replication_factor: 1
 
-    # Index configuration
+    # Index configuration (disabled in the latest Loki versions)
     index:
-      prefix: loki_index_
-      period: 24h
+      enabled: false
 
     # Limits configuration
     limits_config:
       enforce_metric_name: false
       ingestion_rate_mb: 5
-      ingestion_rate_limit: 5000000
-      max_entries_limit: 50000
 
-    # Scraping configuration
+    # Scraping configuration (You don't need scrape_configs if Loki is directly querying itself)
     scrape_configs:
       - job_name: 'loki'
         static_configs:
