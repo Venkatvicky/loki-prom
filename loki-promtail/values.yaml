@@ -7,7 +7,7 @@ image:
 
 storage:
   size: 5Gi
-  className: standard  # Ensure 'standard' is a valid storage class in your cluster
+  className: standard  # This is directly set without Go templating
 
 service:
   type: ClusterIP
@@ -18,10 +18,10 @@ resources: {}
 # PVC configuration to create the PersistentVolumeClaim
 persistence:
   enabled: true
-  storageClassName: {{ .Values.storage.className | default "standard" }}  # Ensure this is a valid storage class
+  storageClassName: standard  # Directly set to 'standard'
   accessModes:
     - ReadWriteOnce
-  size: {{ .Values.storage.size | default "5Gi" }}
+  size: 5Gi  # Directly set the storage size
 
 serviceMonitor:
   enabled: false
