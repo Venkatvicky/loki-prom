@@ -8,4 +8,4 @@ spec:
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: /loki   # <-- updated path
+    path: /mnt/data/loki  # <-- updated path
