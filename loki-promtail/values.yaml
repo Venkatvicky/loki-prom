@@ -7,7 +7,7 @@ image:
 
 storage:
   size: 5Gi
-  className: standard
+  className: standard  # Ensure 'standard' is a valid storage class in your cluster
 
 service:
   type: ClusterIP
@@ -15,9 +15,30 @@ service:
 
 resources: {}
 
+# PVC configuration to create the PersistentVolumeClaim
+persistence:
+  enabled: true
+  storageClassName: {{ .Values.storage.className | default "standard" }}  # Ensure this is a valid storage class
+  accessModes:
+    - ReadWriteOnce
+  size: {{ .Values.storage.size | default "5Gi" }}
+
 serviceMonitor:
   enabled: false
 
 loki:
   # Expose Loki as a service on port 3100 (default)
   url: http://loki:3100/loki/api/v1/push
+
+# Add any additional custom values for your use case, such as node selectors, tolerations, etc.
+nodeSelector: {}
+tolerations: []
+podAffinity: {}
+
+# Set resources for Loki if needed
+resources: {}
+
+# Optional: set the retention policy for logs in Loki (if you want to configure retention)
+retention:
+  enabled: true
+  period: "7d"  # Logs retention period, e.g., 7 days
