@@ -50,7 +50,7 @@ spec:
       volumes:
         - name: config
           configMap:
-            name: {{ include "loki.fullname" . }}-config
+            name: {{ include "loki.fullname" . }}-config  # Ensure the ConfigMap is created
         - name: storage
           persistentVolumeClaim:
             claimName: {{ .Values.persistence.existingClaim | default (include "loki.fullname" .) }}
