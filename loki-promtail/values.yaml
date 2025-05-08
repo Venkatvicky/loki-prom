@@ -22,6 +22,7 @@ persistence:
   accessModes:
     - ReadWriteOnce
   size: 5Gi  # Directly set the storage size
+  existingClaim: loki-pvc  # Add this to reference your existing PVC
 
 serviceMonitor:
   enabled: false
