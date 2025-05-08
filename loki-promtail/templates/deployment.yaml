@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: loki
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: 1
   selector:
     matchLabels:
       app: loki
@@ -15,10 +15,10 @@ spec:
       securityContext:
         runAsUser: 10001
         runAsGroup: 10001
-        fsGroup: 10001   # <- Gives container access to mounted volumes
+        fsGroup: 10001
       containers:
         - name: loki
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          image: "grafana/loki:2.9.0"
           args:
             - -config.file=/etc/loki/loki.yaml
           ports:
@@ -28,9 +28,7 @@ spec:
             - name: config
               mountPath: /etc/loki
             - name: storage
-              mountPath: /loki       # For chunks and index
-            - name: storage
-              mountPath: /wal          # For WAL
+              mountPath: /loki    # Mounted PVC for chunks and index
       volumes:
         - name: config
           configMap:
