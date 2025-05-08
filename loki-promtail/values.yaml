@@ -1,0 +1,23 @@
+replicaCount: 1
+
+image:
+  repository: grafana/loki
+  tag: 2.9.0
+  pullPolicy: IfNotPresent
+
+storage:
+  size: 5Gi
+  className: standard
+
+service:
+  type: ClusterIP
+  port: 3100
+
+resources: {}
+
+serviceMonitor:
+  enabled: false
+
+loki:
+  # Expose Loki as a service on port 3100 (default)
+  url: http://loki:3100/loki/api/v1/push
