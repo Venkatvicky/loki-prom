@@ -1,19 +1,23 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: loki-pvc
-  namespace: loki
+  name: {{ include "loki.fullname" . }}-pvc
+  namespace: {{ .Release.Namespace | default "loki" }}
   labels:
-    app: loki
-    release: loki
+    {{- include "loki.labels" . | nindent 4 }}
 spec:
-  storageClassName: standard
+  storageClassName: {{ .Values.persistence.storageClassName | default "standard" }}
   accessModes:
-    - ReadWriteOnce
+    - {{ .Values.persistence.accessModes | default "ReadWriteOnce" }}
   resources:
     requests:
-      storage: 50Gi
+      storage: {{ .Values.persistence.size | default "50Gi" }}
+  {{- if .Values.persistence.selector }}
+  selector:
+    {{- toYaml .Values.persistence.selector | nindent 4 }}
+  {{- else }}
   selector:
     matchLabels:
-      app: loki
-      release: loki
+      app: {{ include "loki.name" . }}
+      release: {{ .Release.Name }}
+  {{- end }}
