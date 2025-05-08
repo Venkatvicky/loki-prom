@@ -1,6 +1,5 @@
 apiVersion: v2
 name: loki
-description: Loki - log aggregation system by Grafana
-type: application
+description: Loki is a horizontally-scalable, highly-available, multi-tenant log aggregation system.
 version: 0.1.0
-appVersion: "2.9.0"
+appVersion: "2.9.1"
