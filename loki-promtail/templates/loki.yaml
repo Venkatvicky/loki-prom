@@ -1,0 +1,37 @@
+# Loki configuration file
+
+auth_enabled: false
+
+server:
+  http_listen_port: 3100
+  grpc_listen_port: 9095
+  log_level: debug
+
+# Define the storage backend. This example uses local disk storage.
+storage_config:
+  boltdb_shipper:
+    active_index_directory: /mnt/data/loki/index
+    cache_location: /mnt/data/loki/cache
+  filesystem:
+    directory: /mnt/data/loki/chunks
+
+# Ring configuration for distributed mode
+ring:
+  kvstore:
+    store: memberlist
+  replication_factor: 1
+
+# Index configuration (disabled in the latest Loki versions)
+index:
+  enabled: false
+
+# Limits configuration
+limits_config:
+  enforce_metric_name: false
+  ingestion_rate_mb: 5
+
+# Scraping configuration (You don't need scrape_configs if Loki is directly querying itself)
+scrape_configs:
+  - job_name: 'loki'
+    static_configs:
+      - targets: ['localhost:3100']
