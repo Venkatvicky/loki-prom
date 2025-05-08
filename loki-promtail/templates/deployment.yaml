@@ -2,6 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: loki
+  labels:
+    app: loki
 spec:
   replicas: 1
   selector:
@@ -18,14 +20,18 @@ spec:
         fsGroup: 10001
       initContainers:
         - name: fix-permissions
-          image: busybox
+          image: alpine:3.18
           command: ["sh", "-c", "chown -R 10001:10001 /loki"]
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+            privileged: false
           volumeMounts:
             - name: storage
-              mountPath: /loki  # Ensure it mounts the same volume where Loki will write its data
+              mountPath: /loki
       containers:
         - name: loki
-          image: "grafana/loki:2.9.0"
+          image: grafana/loki:2.9.0
           args:
             - -config.file=/etc/loki/loki.yaml
           ports:
@@ -35,11 +41,4 @@ spec:
             - name: config
               mountPath: /etc/loki
             - name: storage
-              mountPath: /loki    # Mounted PVC for chunks and index
-      volumes:
-        - name: config
-          configMap:
-            name: loki-config
-        - name: storage
-          persistentVolumeClaim:
-            claimName: loki-pvc
+              mount
