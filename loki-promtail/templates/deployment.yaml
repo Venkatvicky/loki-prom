@@ -28,7 +28,9 @@ spec:
             - name: config
               mountPath: /etc/loki
             - name: storage
-              mountPath: /mnt/data/loki
+              mountPath: /loki
+            - name: storage
+              mountPath: /wal        # ← Mount the same PVC to /wal
       volumes:
         - name: config
           configMap:
